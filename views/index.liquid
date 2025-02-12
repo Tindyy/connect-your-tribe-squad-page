@@ -1,10 +1,20 @@
 {% render 'partials/head.liquid', title: 'Squad page' %}
 
-<h2>Students</h2>
-<ul>
-  {% for person in persons %}
-    <li><a href="/student/{{ person.id }}">{{ person.name }}</a></li>
-  {% endfor %}
-</ul>
+<main>
+<section class="museum-gallery-container museum-wall">
+  <h2>Students</h2>
+  <ul>
+    {% for person in persons %}
+    <img src="{{person.avatar}}" alt="{{person.name}} avatar" width="60vw">
+      <li><a href="/student/{{ person.id }}">{{ person.name}}</a></li>
+    {% endfor %}
+  </ul>
+</section>
+<section class="museum-visitor museum-floor">
+  <img src="../public/assets/visitor.png" alt="museum-visitor">
+</section>
+
+</main>
+
 
 {% render 'partials/foot.liquid', squads: squads %}
