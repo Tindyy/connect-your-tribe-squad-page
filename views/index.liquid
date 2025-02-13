@@ -1,7 +1,7 @@
 {% render 'partials/head.liquid', title: 'Squad page' %}
 
 <main>
-<section class="museum-gallery-container museum-wall">
+<section class="museum-gallery-container museum-wall" id="people-list">
   <h2>Students</h2>
   <ul>
     {% for person in persons %}
@@ -11,7 +11,15 @@
   </ul>
 </section>
 <section class="museum-visitor museum-floor">
-  <img src="../public/assets/visitor.png" alt="museum-visitor">
+  <img src="/assets/visitor.png" alt="museum-visitor">
+  <label for="filter">Filter</label>
+  <select name="" id="filter">
+    <option value="all">all</option>
+    <option value="">Squad G</option>
+    <option value="">Squad H</option>
+    <option value=""> Birthdate</option>
+    <option value=""> name A-Z</option>
+  </select>
 </section>
 
 </main>
