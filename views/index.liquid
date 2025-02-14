@@ -1,28 +1,29 @@
 {% render 'partials/head.liquid', title: 'Squad page' %}
 
 <main>
-<section class="museum-gallery-container museum-wall" id="people-list">
-  <h2>Students</h2>
-  <ul>
-    {% for person in persons %}
-    <img src="{{person.avatar}}" alt="{{person.name}} avatar" width="60vw">
-      <li><a href="/student/{{ person.id }}">{{ person.name}}</a></li>
-    {% endfor %}
-  </ul>
-</section>
-<section class="museum-visitor museum-floor">
-  <img src="/assets/visitor.png" alt="museum-visitor">
-  <label for="filter">Filter</label>
-  <select name="" id="filter">
-    <option value="all">all</option>
-    <option value="">Squad G</option>
-    <option value="">Squad H</option>
-    <option value=""> Birthdate</option>
-    <option value=""> name A-Z</option>
-  </select>
-</section>
+  <section class="museum-gallery-container museum-wall" id="people-list">
+    <h2>Students</h2>
+    <ul>
+      {% for person in persons %}
+        <li>
+          <img src="{{ person.avatar }}" alt="{{ person.name }} avatar" width="60vw">
+          <a href="/student/{{ person.id }}">{{ person.name }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
 
+  <section class="museum-visitor museum-floor">
+    <img src="/assets/visitor.png" alt="museum visitor">
+    <label for="filter">Filter</label>
+    <select name="filter" id="filter">
+      <option value="all">All</option>
+      <option value="squad-g">Squad G</option>
+      <option value="squad-h">Squad H</option>
+    </select>
+  </section>
 </main>
+
 
 
 {% render 'partials/foot.liquid', squads: squads %}
