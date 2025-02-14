@@ -1,91 +1,85 @@
-// Importeer het npm package Express (uit de door npm aangemaakte node_modules map)
-// Deze package is geïnstalleerd via `npm install`, en staat als 'dependency' in package.json
+// Import the Express package from node_modules
+// This was installed using `npm install` and is listed as a dependency in package.json
 import express from 'express'
 
-// Importeer de Liquid package (ook als dependency via npm geïnstalleerd)
+// Import the Liquid template engine 
 import { Liquid } from 'liquidjs';
 
-// Je kunt de volgende URLs uit onze API gebruiken:
+// Some useful API endpoints you can use:
 // - https://fdnd.directus.app/items/tribe
 // - https://fdnd.directus.app/items/squad
 // - https://fdnd.directus.app/items/person
-// En combineren met verschillende query parameters als filter, sort, search, etc.
-// Gebruik hiervoor de documentatie van https://directus.io/docs/guides/connect/query-parameters
-// En de oefeningen uit https://github.com/fdnd-task/connect-your-tribe-squad-page/blob/main/docs/squad-page-ontwerpen.md
+// You can mix these with filters, sorting, and search queries
+// Check out the docs here: https://directus.io/docs/guides/connect/query-parameters
+// And some example exercises here: https://github.com/fdnd-task/connect-your-tribe-squad-page/blob/main/docs/squad-page-ontwerpen.md
 
-// Haal alle eerstejaars squads uit de WHOIS API op van dit jaar (2024–2025)
+// Grab all first-year squads from the WHOIS API for this year (2024–2025)
 const squadResponse = await fetch('https://fdnd.directus.app/items/squad?filter={"_and":[{"cohort":"2425"},{"tribe":{"name":"FDND Jaar 1"}}]}')
 
-// Lees van de response van die fetch het JSON object in, waar we iets mee kunnen doen
+// Convert the response to JSON so we can use it
 const squadResponseJSON = await squadResponse.json()
 
-// Controleer de data in je console (Let op: dit is _niet_ de console van je browser, maar van NodeJS, in je terminal)
+// Check the data in the console (not the browser console, but your terminal in NodeJS)
 // console.log(squadResponseJSON)
 
-
-// Maak een nieuwe Express applicatie aan, waarin we de server configureren
+// Set up an Express app
 const app = express()
 
-// Gebruik de map 'public' voor statische bestanden (resources zoals CSS, JavaScript, afbeeldingen en fonts)
-// Bestanden in deze map kunnen dus door de browser gebruikt worden
+// Serve static files (CSS, images, fonts, etc.) from the 'public' folder
+// This makes them accessible in the browser
 app.use(express.static('public'))
 
-// Stel Liquid in als 'view engine'
+// Use Liquid as the template engine
 const engine = new Liquid();
 app.engine('liquid', engine.express()); 
 
-// Stel de map met Liquid templates in
-// Let op: de browser kan deze bestanden niet rechtstreeks laden (zoals voorheen met HTML bestanden)
+// Set the folder where Liquid templates are stored
+// These templates aren’t loaded directly in the browser like regular HTML
 app.set('views', './views')
 
-// Zorg dat werken met request data makkelijker wordt
+// Make working with form data easier
 app.use(express.urlencoded({extended: true}))
 
-
-// Om Views weer te geven, heb je Routes nodig
-// Maak een GET route voor de index
+// Routes determine which page gets shown when a user visits a URL
+// This one handles the homepage
 app.get('/', async function (request, response) {
-  // Haal alle personen uit de WHOIS API op, van dit jaar
+  // Fetch all students from the WHOIS API for this year
   const personResponse = await fetch('https://fdnd.directus.app/items/person/?sort=name&fields=*,squads.squad_id.name,squads.squad_id.cohort&filter={"_and":[{"squads":{"squad_id":{"tribe":{"name":"FDND Jaar 1"}}}},{"squads":{"squad_id":{"cohort":"2425"}}}]}')
 
-  // En haal daarvan de JSON op
+  // Convert the response to JSON
   const personResponseJSON = await personResponse.json()
   
-  // personResponseJSON bevat gegevens van alle personen uit alle squads van dit jaar
-  // Je zou dat hier kunnen filteren, sorteren, of zelfs aanpassen, voordat je het doorgeeft aan de view
+  // The JSON contains all students from all squads this year
+  // You can filter, sort, or modify this data here before passing it to the template
 
-  // Render index.liquid uit de views map en geef de opgehaalde data mee als variabele, genaamd persons
-  // Geef ook de eerder opgehaalde squad data mee aan de view
+  // Render index.liquid and pass the data to the template
   response.render('index.liquid', {persons: personResponseJSON.data, squads: squadResponseJSON.data})
 })
 
-// Maak een POST route voor de index; hiermee kun je bijvoorbeeld formulieren afvangen
+// This route handles form submissions (POST requests) on the homepage
 app.post('/', async function (request, response) {
-  // Je zou hier data kunnen opslaan, of veranderen, of wat je maar wilt
-  // Er is nog geen afhandeling van POST, redirect naar GET op /
+  // You could store or update data here if needed
+  // For now, just redirect back to the homepage
   response.redirect(303, '/')
 })
 
-
-// Maak een GET route voor een detailpagina met een route parameter, id
-// Zie de documentatie van Express voor meer info: https://expressjs.com/en/guide/routing.html#route-parameters
+// This route handles individual student detail pages using their ID
+// More info on route parameters: https://expressjs.com/en/guide/routing.html#route-parameters
 app.get('/student/:id', async function (request, response) {
-  // Gebruik de request parameter id en haal de juiste persoon uit de WHOIS API op
+  // Use the ID from the URL to fetch the right student from the WHOIS API
   const personDetailResponse = await fetch('https://fdnd.directus.app/items/person/' + request.params.id)
-  // En haal daarvan de JSON op
+  // Convert response to JSON
   const personDetailResponseJSON = await personDetailResponse.json()
   
-  // Render student.liquid uit de views map en geef de opgehaalde data mee als variable, genaamd person
-  // Geef ook de eerder opgehaalde squad data mee aan de view
+  // Render student.liquid and pass the data to the template
   response.render('student.liquid', {person: personDetailResponseJSON.data, squads: squadResponseJSON.data})
 })
 
-
-// Stel het poortnummer in waar express op moet gaan luisteren
+// Set the port number the server should listen on
 app.set('port', process.env.PORT || 8000)
 
-// Start express op, haal daarbij het zojuist ingestelde poortnummer op
+// Start the Express server
 app.listen(app.get('port'), function () {
-  // Toon een bericht in de console en geef het poortnummer door
-  console.log(`Application started on http://localhost:${app.get('port')}`)
+  // Log a message so you know the server is running
+  console.log(`App is live at http://localhost:${app.get('port')}`)
 })
