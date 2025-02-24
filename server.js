@@ -56,6 +56,12 @@ app.get('/', async function (request, response) {
   response.render('index.liquid', {persons: personResponseJSON.data, squads: squadResponseJSON.data})
 })
 
+let messages = []
+app.get('/berichten', async function (request, response) {
+
+  response.render('messages.liquid', {messages:messages})  
+})
+
 // This route handles form submissions (POST requests) on the homepage
 app.post('/', async function (request, response) {
   // You could store or update data here if needed
